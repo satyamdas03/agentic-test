@@ -28,7 +28,7 @@ const ERROR = `${RED}⚠${RESET}`;
 export class ConsoleReporter implements Reporter {
     onRunStart(totalSuites: number): void {
         console.log();
-        console.log(`${BOLD}${CYAN}🤖 agentic-test${RESET} ${DIM}v0.1.0${RESET}`);
+        console.log(`${BOLD}${CYAN}🤖 agentic-test${RESET} ${DIM}v2.0.0${RESET}`);
         console.log(`${DIM}Running ${totalSuites} test suite(s)...${RESET}`);
         console.log();
     }

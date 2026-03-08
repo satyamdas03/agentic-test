@@ -3,17 +3,22 @@
 // ============================================================================
 
 import type { Span, Trace } from './types.js';
+import type { AgentResponse, AssertionResult } from '../core/types.js';
 
 /**
- * Trace assertion type — evaluates against a Trace object.
+ * Trace assertion type — evaluates against an AgentResponse that optionally includes a trace.
  */
-export type TraceAssertion = (trace: Trace) => { passed: boolean; name: string; message: string };
+export type TraceAssertion = (response: AgentResponse) => AssertionResult;
 
 /**
  * Assert that a span with the given name exists in the trace.
  */
 export function spanExists(name: string): TraceAssertion {
-    return (trace) => {
+    return (response) => {
+        const trace = response.trace as Trace | undefined;
+        if (!trace?.rootSpan) {
+            return { passed: false, name: 'spanExists', message: 'No trace found in response' };
+        }
         const found = findSpans(trace.rootSpan, name).length > 0;
         return {
             passed: found,
@@ -27,7 +32,11 @@ export function spanExists(name: string): TraceAssertion {
  * Assert a span completed within a time limit.
  */
 export function spanDurationWithin(name: string, maxMs: number): TraceAssertion {
-    return (trace) => {
+    return (response) => {
+        const trace = response.trace as Trace | undefined;
+        if (!trace?.rootSpan) {
+            return { passed: false, name: 'spanDurationWithin', message: 'No trace found in response' };
+        }
         const spans = findSpans(trace.rootSpan, name);
         if (spans.length === 0) {
             return { passed: false, name: 'spanDurationWithin', message: `Span "${name}" not found` };
@@ -48,7 +57,11 @@ export function spanDurationWithin(name: string, maxMs: number): TraceAssertion 
  * Assert a span's token usage is within budget.
  */
 export function spanTokensBudget(name: string, maxTokens: number): TraceAssertion {
-    return (trace) => {
+    return (response) => {
+        const trace = response.trace as Trace | undefined;
+        if (!trace?.rootSpan) {
+            return { passed: false, name: 'spanTokensBudget', message: 'No trace found in response' };
+        }
         const spans = findSpans(trace.rootSpan, name);
         if (spans.length === 0) {
             return { passed: false, name: 'spanTokensBudget', message: `Span "${name}" not found` };
@@ -69,7 +82,11 @@ export function spanTokensBudget(name: string, maxTokens: number): TraceAssertio
  * Assert the count of spans with a given name.
  */
 export function spanCount(name: string, expected: number): TraceAssertion {
-    return (trace) => {
+    return (response) => {
+        const trace = response.trace as Trace | undefined;
+        if (!trace?.rootSpan) {
+            return { passed: false, name: 'spanCount', message: 'No trace found in response' };
+        }
         const count = findSpans(trace.rootSpan, name).length;
         const passed = count === expected;
         return {
@@ -86,7 +103,11 @@ export function spanCount(name: string, expected: number): TraceAssertion {
  * Assert the maximum depth of the trace tree.
  */
 export function traceDepthWithin(maxDepth: number): TraceAssertion {
-    return (trace) => {
+    return (response) => {
+        const trace = response.trace as Trace | undefined;
+        if (!trace?.rootSpan) {
+            return { passed: false, name: 'traceDepthWithin', message: 'No trace found in response' };
+        }
         const depth = computeDepth(trace.rootSpan);
         const passed = depth <= maxDepth;
         return {
@@ -103,7 +124,11 @@ export function traceDepthWithin(maxDepth: number): TraceAssertion {
  * Assert no span in the trace errored.
  */
 export function noSpanErrors(): TraceAssertion {
-    return (trace) => {
+    return (response) => {
+        const trace = response.trace as Trace | undefined;
+        if (!trace?.rootSpan) {
+            return { passed: false, name: 'noSpanErrors', message: 'No trace found in response' };
+        }
         const errors = findErrorSpans(trace.rootSpan);
         const passed = errors.length === 0;
         return {

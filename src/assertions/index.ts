@@ -41,3 +41,8 @@ export {
 export {
     judgedBy, outputQuality, outputHelpfulness, outputAccuracy, outputProfessionalism,
 } from './llm-judge.js';
+
+// Tracing assertions (v2.0.0)
+export {
+    spanExists, spanDurationWithin, spanTokensBudget, spanCount, traceDepthWithin, noSpanErrors
+} from '../tracing/assertions.js';

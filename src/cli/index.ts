@@ -59,10 +59,19 @@ program
         }
 
         // Get registered suites
-        const suites = getRegisteredSuites();
+        let suites = getRegisteredSuites();
+
+        // Apply string pattern filter
+        if (options.filter) {
+            const regex = new RegExp(options.filter, 'i');
+            for (const suite of suites) {
+                suite.filterTests(regex);
+            }
+            suites = suites.filter((s) => s.getTests().length > 0);
+        }
 
         if (suites.length === 0) {
-            console.log('\n🤖 agentic-test: No test suites found in test files.');
+            console.log('\n🤖 agentic-test: No test suites found matching filter.');
             process.exit(0);
         }
 

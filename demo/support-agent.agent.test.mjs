@@ -8,7 +8,7 @@
 // - Answer general questions
 // ============================================================================
 
-import { describe, test, createMockAgent, AgenticTestRunner, ConsoleReporter } from 'agentic-test';
+import { describe, test, createMockAgent } from 'agentic-test';
 import {
     outputContains,
     outputDoesNotContain,
@@ -199,14 +199,4 @@ describe('Customer Support Agent - General Queries', { adapter: supportAgent }, 
 
 // ============================================================================
 // Step 3: Run the tests programmatically
-// ============================================================================
-
-import { getRegisteredSuites } from 'agentic-test';
-
-const runner = new AgenticTestRunner();
-runner.addReporter(new ConsoleReporter());
-
-const result = await runner.run(getRegisteredSuites());
-
-// Exit with proper code for CI/CD
-process.exit(result.failed > 0 ? 1 : 0);
+// ============================================================================// End of demos

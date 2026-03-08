@@ -33,6 +33,8 @@ export interface AgentResponse {
     raw?: unknown;
     /** Any error that occurred during execution */
     error?: Error;
+    /** Tracing data for deep execution inspection (v2.0.0) */
+    trace?: any;
 }
 
 /**

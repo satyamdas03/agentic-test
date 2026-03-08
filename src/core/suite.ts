@@ -55,6 +55,13 @@ export class AgenticTestSuite {
     }
 
     /**
+     * Filter the registered tests by a regular expression match on the name.
+     */
+    filterTests(regex: RegExp): void {
+        this.tests = this.tests.filter((t) => regex.test(t.name) || regex.test(this.name));
+    }
+
+    /**
      * Execute all tests in this suite.
      */
     async run(): Promise<SuiteResult> {
