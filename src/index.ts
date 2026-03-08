@@ -52,6 +52,7 @@ export { saveRunResult, loadRunHistory } from './dashboard/history.js';
 
 // Tracing (v2.0.0)
 export { createTracer, Tracer } from './tracing/tracer.js';
+export { createMultiAgentTracer, MultiAgentTracer } from './tracing/multi-agent.js';
 export { spanExists, spanDurationWithin, spanTokensBudget, spanCount, traceDepthWithin, noSpanErrors } from './tracing/assertions.js';
 export type { TraceAssertion } from './tracing/assertions.js';
 export { exportTraceAsJSON, exportTraceAsMermaid, renderTraceTimeline } from './tracing/export.js';
@@ -64,6 +65,10 @@ export type { JudgeProvider } from './assertions/llm-judge.js';
 
 // CI (v2.0.0)
 export { generateGitHubActionsWorkflow, scaffoldGitHubActions } from './ci/github-actions.js';
+
+// Benchmarks (v3.0.0)
+export { runRagBenchmark, runReactBenchmark } from './benchmarks/index.js';
+export type { BenchmarkType, BenchmarkOptions, BenchmarkSample, BenchmarkReport } from './benchmarks/index.js';
 
 // Types
 export type {

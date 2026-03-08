@@ -33,11 +33,23 @@ export function exportTraceAsJSON(trace: Trace): object[] {
  */
 export function exportTraceAsMermaid(trace: Trace): string {
     const lines: string[] = ['sequenceDiagram'];
-    lines.push('  participant Agent');
 
     const actors = new Set<string>();
+    const isMultiAgent = trace.rootSpan.children.some(c => c.attributes?.type === 'multi-agent-message' || c.attributes?.type === 'multi-agent-task');
+
+    if (!isMultiAgent) {
+        lines.push('  participant Agent');
+    }
+
     const collectActors = (span: Span) => {
-        if (span.name !== trace.rootSpan.name) actors.add(span.name);
+        if (span.attributes?.type === 'multi-agent-message') {
+            actors.add(span.attributes.from as string);
+            actors.add(span.attributes.to as string);
+        } else if (span.attributes?.type === 'multi-agent-task') {
+            actors.add(span.attributes.agent as string);
+        } else if (!isMultiAgent && span.name !== trace.rootSpan.name) {
+            actors.add(span.name);
+        }
         span.children.forEach(collectActors);
     };
     collectActors(trace.rootSpan);
@@ -45,20 +57,47 @@ export function exportTraceAsMermaid(trace: Trace): string {
 
     const renderSpan = (span: Span, caller: string = 'Agent') => {
         for (const child of span.children) {
+            const isMessage = child.attributes?.type === 'multi-agent-message';
+            const isTask = child.attributes?.type === 'multi-agent-task';
             const dur = child.duration ? ` (${Math.round(child.duration)}ms)` : '';
-            const target = sanitizeMermaid(child.name);
+
+            let source = caller;
+            let target = sanitizeMermaid(child.name);
+            let label = target;
+
+            if (isMessage) {
+                source = sanitizeMermaid(child.attributes!.from as string);
+                target = sanitizeMermaid(child.attributes!.to as string);
+                label = `Message${dur}`;
+            } else if (isTask) {
+                source = sanitizeMermaid(child.attributes!.agent as string);
+                // The target is the task itself
+            }
+
             if (child.status === 'error') {
-                lines.push(`  ${caller}-x${target}: ${target}${dur} ❌`);
+                lines.push(`  ${source}-x${target}: ${label} ❌`);
             } else {
-                lines.push(`  ${caller}->>${target}: ${target}${dur}`);
+                lines.push(`  ${source}->>${target}: ${label}`);
                 if (child.children.length > 0) {
-                    renderSpan(child, target);
+                    renderSpan(child, isMessage ? target : (isTask ? target : target));
                 }
-                lines.push(`  ${target}-->>` + caller + ': done');
+                if (!isMessage) {
+                    lines.push(`  ${target}-->>${source}: done`);
+                }
             }
         }
     };
-    renderSpan(trace.rootSpan);
+
+    // For multi-agent traces, the root span is just the container.
+    if (isMultiAgent) {
+        // Find the first task to determine the initial caller
+        const firstTask = trace.rootSpan.children.find(c => c.attributes?.type === 'multi-agent-task');
+        const initialCaller = firstTask ? sanitizeMermaid(firstTask.attributes!.agent as string) : 'System';
+        if (!actors.has(initialCaller)) lines.push(`  participant ${initialCaller}`);
+        renderSpan(trace.rootSpan, initialCaller);
+    } else {
+        renderSpan(trace.rootSpan);
+    }
 
     return lines.join('\n');
 }

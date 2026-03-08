@@ -56,13 +56,16 @@ describe('Tracer', () => {
 });
 
 describe('Trace Assertions', () => {
+    // Helper to mock AgentResponse wrapper
+    const mockResponse = (trace: any) => ({ output: '', toolCalls: [], tokens: 0, duration: 0, trace });
+
     it('spanExists finds named span', () => {
         const tracer = createTracer('agent');
         const s = tracer.startSpan('llm-call');
         tracer.endSpan(s);
         const trace = tracer.getTrace();
-        expect(spanExists('llm-call')(trace).passed).toBe(true);
-        expect(spanExists('nonexistent')(trace).passed).toBe(false);
+        expect(spanExists('llm-call')(mockResponse(trace)).passed).toBe(true);
+        expect(spanExists('nonexistent')(mockResponse(trace)).passed).toBe(false);
     });
 
     it('spanCount checks occurrences', () => {
@@ -70,7 +73,7 @@ describe('Trace Assertions', () => {
         tracer.endSpan(tracer.startSpan('tool'));
         tracer.endSpan(tracer.startSpan('tool'));
         const trace = tracer.getTrace();
-        expect(spanCount('tool', 2)(trace).passed).toBe(true);
+        expect(spanCount('tool', 2)(mockResponse(trace)).passed).toBe(true);
     });
 
     it('traceDepthWithin limits depth', () => {
@@ -79,15 +82,15 @@ describe('Trace Assertions', () => {
         tracer.endSpan(tracer.startSpan('b'));
         tracer.endSpan(s1);
         const trace = tracer.getTrace();
-        expect(traceDepthWithin(5)(trace).passed).toBe(true);
-        expect(traceDepthWithin(1)(trace).passed).toBe(false);
+        expect(traceDepthWithin(5)(mockResponse(trace)).passed).toBe(true);
+        expect(traceDepthWithin(1)(mockResponse(trace)).passed).toBe(false);
     });
 
     it('noSpanErrors passes for clean traces', () => {
         const tracer = createTracer('agent');
         tracer.endSpan(tracer.startSpan('ok'));
         const trace = tracer.getTrace();
-        expect(noSpanErrors()(trace).passed).toBe(true);
+        expect(noSpanErrors()(mockResponse(trace)).passed).toBe(true);
     });
 });
 

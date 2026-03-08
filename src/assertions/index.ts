@@ -46,3 +46,8 @@ export {
 export {
     spanExists, spanDurationWithin, spanTokensBudget, spanCount, traceDepthWithin, noSpanErrors
 } from '../tracing/assertions.js';
+
+// Multi-Agent Assertions (v3.0.0)
+export {
+    messagePassed, agentParticipated, routingPathMatches
+} from './multi-agent.js';

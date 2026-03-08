@@ -18,7 +18,8 @@ export function saveRunResult(result: RunResult, dir?: string): string {
     }
 
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const filename = `run-${timestamp}.json`;
+    const randomSuffix = Math.random().toString(36).substring(2, 6);
+    const filename = `run-${timestamp}-${randomSuffix}.json`;
     const filepath = join(historyDir, filename);
 
     const record = {

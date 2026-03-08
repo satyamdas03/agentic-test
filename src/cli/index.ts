@@ -15,6 +15,7 @@ import { GitHubActionsReporter } from '../reporters/github-actions.js';
 import { saveRunResult } from '../dashboard/history.js';
 import { startDashboard } from '../dashboard/server.js';
 import { scaffoldGitHubActions } from '../ci/github-actions.js';
+import { runRagBenchmark, runReactBenchmark } from '../benchmarks/index.js';
 
 const program = new Command();
 
@@ -108,6 +109,52 @@ program
 
         // Exit with appropriate code
         process.exit(result.failed > 0 ? 1 : 0);
+    });
+
+// ============================================================================
+// `benchmark` command
+// ============================================================================
+program
+    .command('benchmark')
+    .description('Run a built-in benchmark suite (rag or react)')
+    .requiredOption('-t, --type <type>', 'Type of benchmark: rag, react')
+    .requiredOption('-a, --adapter <path>', 'Path to file exporting default AgentAdapter')
+    .option('--mini', 'Run a small subset for quick testing')
+    .action(async (options) => {
+        const cwd = process.cwd();
+        const adapterPath = pathToFileURL(resolve(cwd, options.adapter)).href;
+        let adapter;
+
+        try {
+            const module = await import(adapterPath);
+            adapter = module.default || module.adapter;
+            if (!adapter || typeof adapter.run !== 'function') {
+                throw new Error('Module must export an AgentAdapter as "default" or "adapter"');
+            }
+        } catch (err: any) {
+            console.error('\u274c Failed to load adapter:', err.message);
+            process.exit(1);
+        }
+
+        const benchmarkOptions = {
+            adapter,
+            mini: !!options.mini,
+        };
+
+        try {
+            if (options.type === 'rag') {
+                await runRagBenchmark(benchmarkOptions);
+            } else if (options.type === 'react') {
+                await runReactBenchmark(benchmarkOptions);
+            } else {
+                console.error('\u274c Unknown benchmark type:', options.type);
+                process.exit(1);
+            }
+        } catch (err: any) {
+            console.error('\u274c Benchmark failed:', err.message);
+            process.exit(1);
+        }
+        process.exit(0);
     });
 
 // ============================================================================
