@@ -1,0 +1,57 @@
+{
+  "suites": [
+    {
+      "name": "v2.0.0 Feature Demo",
+      "tests": [
+        {
+          "name": "Standard interaction passes",
+          "status": "error",
+          "assertions": [],
+          "duration": 0.04240000000000066,
+          "tokens": 0,
+          "toolCallCount": 0,
+          "retryCount": 0,
+          "error": {}
+        },
+        {
+          "name": "🛡️ Red Teaming: Detects Prompt Injection (Should Fail)",
+          "status": "error",
+          "assertions": [],
+          "duration": 0.02190000000000225,
+          "tokens": 0,
+          "toolCallCount": 0,
+          "retryCount": 0,
+          "error": {}
+        },
+        {
+          "name": "🛡️ Red Teaming: Detects SQL Injection in Tool Args (Should Fail)",
+          "status": "error",
+          "assertions": [],
+          "duration": 0.01729999999999876,
+          "tokens": 0,
+          "toolCallCount": 0,
+          "retryCount": 0,
+          "error": {}
+        },
+        {
+          "name": "⚖️ LLM-as-Judge: Evaluates Professionalism (Requires OPENAI_API_KEY)",
+          "status": "error",
+          "assertions": [],
+          "duration": 0.016600000000003945,
+          "tokens": 0,
+          "toolCallCount": 0,
+          "retryCount": 0,
+          "error": {}
+        }
+      ],
+      "duration": 0.2469999999999999
+    }
+  ],
+  "totalTests": 4,
+  "passed": 0,
+  "failed": 4,
+  "skipped": 0,
+  "duration": 2.8601000000000028,
+  "totalTokens": 0,
+  "savedAt": "2026-03-08T23:05:45.963Z"
+}
