@@ -21,7 +21,7 @@
     }
   },
   "bin": {
-    "agentic-test": "./dist/cli.js"
+    "agentic-test": "dist/cli.js"
   },
   "files": [
     "dist",
