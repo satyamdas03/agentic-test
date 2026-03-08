@@ -1,5 +1,5 @@
 // ============================================================================
-// agentic-test — Assertion Index (re-exports all assertions)
+// agentic-test — Assertions Index (v1.0.0)
 // ============================================================================
 
 // Output assertions
@@ -35,9 +35,17 @@ export {
     costBudget,
 } from './performance.js';
 
-// Semantic assertions
+// Semantic assertions (v1.0.0: now with embedding support)
 export {
     outputSemanticallyMatches,
+    outputSemanticallyMatchesAsync,
     noHallucination,
     custom,
 } from './semantic.js';
+
+// Streaming assertions (v1.0.0)
+export {
+    streamCompletes,
+    streamChunkCount,
+    firstChunkWithin,
+} from '../adapters/streaming.js';

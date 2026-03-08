@@ -101,6 +101,23 @@ export interface TestCaseConfig {
     only?: boolean;
     /** Additional adapter options */
     adapterOptions?: AdapterOptions;
+    /**
+     * Statistical mode: run the test N times and assert on pass rate.
+     * @example
+     * ```ts
+     * test('reliable agent', {
+     *   input: 'Book a flight',
+     *   assertions: [...],
+     *   statistical: { runs: 10, passRate: 0.8 },
+     * });
+     * ```
+     */
+    statistical?: {
+        /** Number of times to run the test */
+        runs: number;
+        /** Minimum fraction of runs that must pass (0.0 to 1.0) */
+        passRate: number;
+    };
 }
 
 /**
