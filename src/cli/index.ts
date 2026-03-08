@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // ============================================================================
-// agentic-test — CLI Entry Point
+// agentic-test — CLI Entry Point (v2.0.0)
 // ============================================================================
 
 import { Command } from 'commander';
@@ -12,13 +12,16 @@ import { ConsoleReporter } from '../reporters/console.js';
 import { JsonReporter } from '../reporters/json.js';
 import { JUnitReporter } from '../reporters/junit.js';
 import { GitHubActionsReporter } from '../reporters/github-actions.js';
+import { saveRunResult } from '../dashboard/history.js';
+import { startDashboard } from '../dashboard/server.js';
+import { scaffoldGitHubActions } from '../ci/github-actions.js';
 
 const program = new Command();
 
 program
     .name('agentic-test')
     .description('🤖 A testing framework for AI agent workflows')
-    .version('0.1.0');
+    .version('2.0.0');
 
 // ============================================================================
 // `run` command
@@ -33,6 +36,8 @@ program
     .option('--retries <n>', 'Number of retries for failed tests', '0')
     .option('--timeout <ms>', 'Default timeout in milliseconds', '30000')
     .option('--parallel', 'Run suites in parallel')
+    .option('--save', 'Save results for the dashboard')
+    .option('--verbose', 'Verbose output with assertion details')
     .action(async (options) => {
         const cwd = process.cwd();
 
@@ -86,8 +91,58 @@ program
         // Run tests
         const result = await runner.run(suites);
 
+        // Save results if --save
+        if (options.save) {
+            const filepath = saveRunResult(result);
+            console.log(`\n  💾 Results saved: ${filepath}`);
+        }
+
         // Exit with appropriate code
         process.exit(result.failed > 0 ? 1 : 0);
+    });
+
+// ============================================================================
+// `dashboard` command
+// ============================================================================
+program
+    .command('dashboard')
+    .description('Open the web dashboard to view test history and trends')
+    .option('-p, --port <port>', 'Port number', '3000')
+    .option('-d, --dir <path>', 'Results directory')
+    .action((options) => {
+        startDashboard({
+            port: parseInt(options.port),
+            historyDir: options.dir,
+        });
+    });
+
+// ============================================================================
+// `ci` command
+// ============================================================================
+program
+    .command('ci')
+    .description('Generate CI/CD pipeline configuration')
+    .option('--setup', 'Scaffold GitHub Actions workflow')
+    .option('--node-version <version>', 'Node.js version', '20')
+    .option('--secrets <keys...>', 'Secret names to include')
+    .option('--schedule <cron>', 'Cron schedule for periodic runs')
+    .action((options) => {
+        if (options.setup) {
+            const filepath = scaffoldGitHubActions(process.cwd(), {
+                nodeVersion: options.nodeVersion,
+                secrets: options.secrets,
+                schedule: options.schedule,
+            });
+            console.log('\n🤖 GitHub Actions workflow generated!');
+            console.log(`  📁 ${filepath}`);
+            console.log('\n  Next steps:');
+            console.log('  1. Add your secrets in GitHub → Settings → Secrets');
+            console.log('  2. Push to trigger the pipeline');
+            console.log();
+        } else {
+            console.log('\n🤖 Usage: agentic-test ci --setup');
+            console.log('  Generates a GitHub Actions workflow for agent testing.\n');
+        }
     });
 
 // ============================================================================
@@ -112,9 +167,7 @@ import {
   toolWasCalled,
   toolCalledWith,
   completedWithin,
-  toolCallOrder,
 } from 'agentic-test/assertions';
-import { createAdapter } from 'agentic-test';
 import { createMockAgent } from 'agentic-test';
 
 // Create a mock agent for demonstration
@@ -175,14 +228,11 @@ describe('Weather Agent', { adapter: agent }, () => {
 // Utilities
 // ============================================================================
 
-/**
- * Find test files matching a glob pattern (simple implementation).
- */
 function findTestFiles(dir: string, _pattern: string): string[] {
     const files: string[] = [];
 
     function walk(currentDir: string, depth: number = 0): void {
-        if (depth > 5) return; // Limit recursion depth
+        if (depth > 5) return;
         if (!existsSync(currentDir)) return;
 
         try {

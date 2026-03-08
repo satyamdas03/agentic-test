@@ -1,51 +1,43 @@
 // ============================================================================
-// agentic-test — Assertions Index (v1.0.0)
+// agentic-test — Assertions Index (v2.0.0)
 // ============================================================================
 
 // Output assertions
 export {
-    outputContains,
-    outputDoesNotContain,
-    outputMatches,
-    outputStartsWith,
-    outputEndsWith,
-    outputContainsIgnoreCase,
-    outputMinLength,
-    outputMaxLength,
-    outputIsNotEmpty,
+    outputContains, outputDoesNotContain, outputMatches,
+    outputStartsWith, outputEndsWith, outputContainsIgnoreCase,
+    outputMinLength, outputMaxLength, outputIsNotEmpty,
 } from './output.js';
 
 // Tool call assertions
 export {
-    toolWasCalled,
-    toolNotCalled,
-    toolCalledWith,
-    toolCallOrder,
-    toolCalledTimes,
-    totalToolCalls,
-    toolReturnedResult,
+    toolWasCalled, toolNotCalled, toolCalledWith,
+    toolCallOrder, toolCalledTimes, totalToolCalls, toolReturnedResult,
 } from './tools.js';
 
 // Performance assertions
 export {
-    completedWithin,
-    tokensBudget,
-    maxToolCalls,
-    minToolCalls,
-    costBudget,
+    completedWithin, tokensBudget, maxToolCalls, minToolCalls, costBudget,
 } from './performance.js';
 
-// Semantic assertions (v1.0.0: now with embedding support)
+// Semantic assertions
 export {
-    outputSemanticallyMatches,
-    outputSemanticallyMatchesAsync,
-    noHallucination,
-    custom,
+    outputSemanticallyMatches, outputSemanticallyMatchesAsync,
+    noHallucination, custom,
 } from './semantic.js';
 
-// Streaming assertions (v1.0.0)
+// Streaming assertions
 export {
-    streamCompletes,
-    streamChunkCount,
-    firstChunkWithin,
+    streamCompletes, streamChunkCount, firstChunkWithin,
 } from '../adapters/streaming.js';
+
+// Safety assertions (v2.0.0 — Red Teaming)
+export {
+    noPromptInjection, noToxicity, outputBelowToxicityThreshold,
+    noPII, noJailbreak, safeForMinors, noCodeExecution, noUnauthorizedDataAccess,
+} from './safety.js';
+
+// LLM-as-Judge assertions (v2.0.0)
+export {
+    judgedBy, outputQuality, outputHelpfulness, outputAccuracy, outputProfessionalism,
+} from './llm-judge.js';
