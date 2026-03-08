@@ -1,6 +1,6 @@
 {
   "name": "agentic-test",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "A lightweight, Jest-like testing framework for AI agent workflows. Test tool calls, outputs, latency, and costs with a familiar describe/test API.",
   "author": "Satyam Das <satyamdas03@gmail.com>",
   "license": "MIT",
